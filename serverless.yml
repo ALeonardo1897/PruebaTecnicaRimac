@@ -1,0 +1,49 @@
+plugins:
+    - serverless-offline
+service: rimac-prueba-tecnica
+provider:
+  name: aws
+  runtime: nodejs12.x
+  stage: dev
+  region: us-east-1
+  iamRoleStatements:
+    - Effect: Allow
+      Action:
+        - dynamodb:Query
+        - dynamodb:Scan
+        - dynamodb:GetItem
+        - dynamodb:PutItem
+      Resource: "*"
+resources:
+  Resources:
+    PeopleStarWarsTable:
+      Type: 'AWS::DynamoDB::Table'
+      Properties:
+        AttributeDefinitions:
+          - AttributeName: "id"
+            AttributeType: "S"   
+        KeySchema:
+          - AttributeName: "id"
+            KeyType: "HASH"
+        ProvisionedThroughput:
+          ReadCapacityUnits: 1
+          WriteCapacityUnits: 1
+        TableName: PeopleStarWars
+functions:
+
+  GETSWAPI:
+    handler: app/read.handler
+    events:
+      - http:
+          path: /swapi
+          method: GET
+      - http:
+          path: /api
+          method: GET
+
+  POSTMYAPI:
+    handler: app/write.handler
+    events:
+      - http:
+          path: /api
+          method: POST
